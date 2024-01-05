@@ -10,7 +10,7 @@
 #include <stdint.h>
 
 // The I2C address of the person sensor board.
-#define PERSON_SENSOR_I2C_ADDRESS (0x62)
+#define PERSON_SENSOR_I2C_ADDRESS (uint8_t)(0x62)
 
 // Configuration commands for the sensor. Write this as a byte to the I2C bus
 // followed by a second byte as an argument value.
@@ -78,12 +78,12 @@ typedef struct __attribute__ ((__packed__)) {
 // Fetch the latest results from the sensor. Returns false if the read didn't
 // succeed.
 inline bool person_sensor_read(person_sensor_results_t* results) {
-    // For an explanation of why we're doing the read in chunks see 
+    // For an explanation of why we're doing the read in chunks see
     // https://www.arduino.cc/reference/en/language/functions/communication/wire/
-    // In particular: "The Wire library implementation uses a 32 byte buffer, 
-    // therefore any communication should be within this limit. Exceeding 
+    // In particular: "The Wire library implementation uses a 32 byte buffer,
+    // therefore any communication should be within this limit. Exceeding
     // bytes in a single transmission will just be dropped."
-    // I missed this warning in my initial implementatiom, which caused 
+    // I missed this warning in my initial implementatiom, which caused
     // https://github.com/usefulsensors/person_sensor_arduino/issues/2 on
     // older boards like the Uno.
     const int maxBytesPerChunk = 32;
@@ -92,7 +92,7 @@ inline bool person_sensor_read(person_sensor_results_t* results) {
     int index = 0;
     while (index < totalBytes) {
         const int bytesRemaining = totalBytes - index;
-        const int bytesThisChunk = min(bytesRemaining, maxBytesPerChunk);
+        const size_t bytesThisChunk = min(bytesRemaining, maxBytesPerChunk);
         const int endIndex = index + bytesThisChunk;
         const bool isLastChunk = (bytesRemaining <= maxBytesPerChunk);
         Wire.requestFrom(PERSON_SENSOR_I2C_ADDRESS, bytesThisChunk, isLastChunk);
